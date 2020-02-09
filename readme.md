@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/mpuzanov/calendar.svg?branch=master)](https://travis-ci.org/mpuzanov/calendar)
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/mpuzanov/calendar)](https://goreportcard.com/report/github.com/mpuzanov/calendar)
+
+
 # Домашнее задание
 
 ## Конфигурирование микросервиса
