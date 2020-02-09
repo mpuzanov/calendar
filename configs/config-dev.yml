@@ -1,0 +1,10 @@
+# ip и port на котором должен слушать web-сервер
+http_listen: "localhost:8090"
+# уровень логирования (error / warn / info / debug)
+log_level: debug
+# путь к файлу логов
+log_file: "file_dev.log"
+# формат логирования
+log_format_JSON: true
+# Настройки СУБД
+database_url: ""
