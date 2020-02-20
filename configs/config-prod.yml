@@ -7,4 +7,5 @@ log_file: "file_prod.log"
 # формат логирования
 log_format_JSON: true
 # Настройки СУБД
-database_url: ""
+db_name: "MemoryMap"
+db_url: ""

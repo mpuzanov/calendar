@@ -1,4 +1,6 @@
-package model
+package errors
+
+import "errors"
 
 //EventError для выдачи ошибок по событиям календаря
 type EventError string
@@ -17,3 +19,8 @@ var (
 	//ErrEditEvent "ошибка изменения события"
 	ErrEditEvent = EventError("Ошибка изменения события")
 )
+
+//Is обёртка над errors.Is
+func Is(err, target error) bool {
+	return errors.Is(err, target)
+}

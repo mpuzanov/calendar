@@ -1,4 +1,4 @@
-package memory
+package memslice
 
 import (
 	"strconv"
@@ -32,11 +32,6 @@ func generateTestData() {
 }
 
 func TestFindEventByID(t *testing.T) {
-	var eventFind model.Event
-	for _, val := range testStore.db {
-		eventFind = val
-		break
-	}
 
 	testCases := []struct {
 		desc string
@@ -46,8 +41,8 @@ func TestFindEventByID(t *testing.T) {
 	}{
 		{
 			desc: "Тест 1",
-			find: eventFind.ID.String(),
-			want: eventFind.ID.String(),
+			find: testStore.db[1].ID.String(),
+			want: testStore.db[1].ID.String(),
 			err:  nil,
 		},
 	}
@@ -107,11 +102,10 @@ func TestDelEvent(t *testing.T) {
 
 	var eventTestDel model.Event
 
-	for _, val := range testStore.db {
-		eventTestDel = val
-		break
-	}
 	countEvent := len(testStore.db)
+	//Добавляем событие для удаления
+	eventTestDel = *NewEvent("user1", "Event del_1", "", startTime, endTime)
+	testStore.db = append(testStore.db, eventTestDel)
 
 	testCases := []struct {
 		desc     string
@@ -123,13 +117,13 @@ func TestDelEvent(t *testing.T) {
 			desc:     "Тест удаления события",
 			eventDel: eventTestDel,
 			err:      nil,
-			want:     countEvent - 1,
+			want:     countEvent,
 		},
 		{
 			desc:     "Тест удаления события (должна быть ошибка)", //нет такого события
 			eventDel: eventTestDel,
 			err:      errors.ErrDelEvent,
-			want:     countEvent - 1,
+			want:     countEvent,
 		},
 	}
 	for _, tC := range testCases {
@@ -151,11 +145,7 @@ func TestDelEvent(t *testing.T) {
 
 func TestUpdateEvent(t *testing.T) {
 
-	var eventTest model.Event
-	for _, val := range testStore.db {
-		eventTest = val
-		break
-	}
+	eventTest = testStore.db[0]
 
 	testCases := []struct {
 		desc   string
@@ -174,17 +164,15 @@ func TestUpdateEvent(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-
 			tC.event.Text = tC.toText
 			if err := testStore.UpdateEvent(&tC.event); err != nil {
 				if !errors.Is(err, tC.err) {
 					t.Errorf("%s error: %v", tC.desc, err)
 				}
 			}
-			got, err := testStore.FindEventByID(eventTest.ID.String())
-
-			if got.Text != tC.want || err != nil {
-				t.Errorf("%s, got=%v, expected=%v", tC.desc, got.Text, tC.want)
+			got := testStore.db[0].Text
+			if got != tC.want {
+				t.Errorf("%s, got=%v, expected=%v", tC.desc, got, tC.want)
 			}
 		})
 	}

@@ -7,4 +7,5 @@ log_file: "file_dev.log"
 # формат логирования
 log_format_JSON: true
 # Настройки СУБД
-database_url: ""
+db_name: "MemorySlice"
+db_url: ""

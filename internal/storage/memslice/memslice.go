@@ -1,4 +1,4 @@
-package memory
+package memslice
 
 import (
 	"fmt"
@@ -11,64 +11,61 @@ import (
 
 //EventStore структура хранения списка событий
 type EventStore struct {
-	db map[string]model.Event
+	db []model.Event
 }
 
 //NewEventStore Возвращаем новое хранилище
 func NewEventStore() *EventStore {
-	return &EventStore{db: make(map[string]model.Event)}
+	return &EventStore{db: make([]model.Event, 0)}
 }
 
 //GetEvents Листинг событий
 func (s *EventStore) GetEvents() []model.Event {
-	var out []model.Event
-	for _, val := range s.db {
-		out = append(out, val)
-	}
-	return out
+	return s.db
 }
 
 //FindEventByID Найти событие
 func (s *EventStore) FindEventByID(id string) (*model.Event, error) {
-
-	ev, exist := s.db[id]
-	if exist {
-		return &ev, nil
+	for _, event := range s.db {
+		if event.ID.String() == id {
+			return &event, nil
+		}
 	}
 	return nil, errors.ErrNotEvent
 }
 
 //AddEvent Добавить событие
 func (s *EventStore) AddEvent(event *model.Event) error {
-	id := event.ID.String()
-	_, exist := s.db[id]
-	if exist {
+	ev, _ := s.FindEventByID(event.ID.String())
+	if ev != nil {
 		return fmt.Errorf("событие: %s(%s) уже существует. %w", event.Header, event.ID, errors.ErrAddEvent)
 	}
-	s.db[id] = *event
+	s.db = append(s.db, *event)
+
 	return nil
 }
 
 //UpdateEvent Изменить событие
 func (s *EventStore) UpdateEvent(event *model.Event) error {
-	id := event.ID.String()
-	_, exist := s.db[id]
-	if !exist {
-		return fmt.Errorf("нет события: %s(%s). %w", event.Header, event.ID, errors.ErrEditEvent)
+	for i, ev := range s.db {
+		if ev.ID == event.ID {
+			s.db[i] = *event
+			return nil
+		}
 	}
-	s.db[id] = *event
-	return nil
+	return fmt.Errorf("нет события: %s(%s). %w", event.Header, event.ID, errors.ErrEditEvent)
 }
 
 //DelEvent Удалить событие
 func (s *EventStore) DelEvent(event *model.Event) error {
-	id := event.ID.String()
-	_, exist := s.db[id]
-	if !exist {
-		return fmt.Errorf("нет события: %s(%s). %w", event.Header, event.ID, errors.ErrDelEvent)
+
+	for i, ev := range s.db {
+		if ev.ID == event.ID {
+			s.db = append(s.db[:i], s.db[i+1:]...)
+			return nil
+		}
 	}
-	delete(s.db, id)
-	return nil
+	return fmt.Errorf("нет события с кодом: %s. %w", event.ID, errors.ErrDelEvent)
 }
 
 //String Печать списка событий
@@ -93,4 +90,16 @@ func (s *EventStore) CreateEvent(user, header, text string, startTime time.Time,
 		return nil, err
 	}
 	return event, nil
+}
+
+//NewEvent Формируем новое событие
+func NewEvent(user, header, text string, startTime time.Time, endTime time.Time) *model.Event {
+	return &model.Event{
+		ID:        uuid.New(),
+		User:      user,
+		Header:    header,
+		Text:      text,
+		StartTime: startTime,
+		EndTime:   endTime,
+	}
 }

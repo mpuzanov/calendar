@@ -1,0 +1,68 @@
+package web
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/mpuzanov/otus-go/calendar/internal/calendar"
+	"github.com/mpuzanov/otus-go/calendar/internal/config"
+	"go.uber.org/zap"
+)
+
+// Start Запуск сервера
+func Start(config *config.Config, logger *zap.Logger, evs *calendar.Calendar) error {
+
+	srv := newServer(config, logger, evs)
+
+	//запускаем веб-сервер
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Printf("Server started: %s, file log: %s\n", srv.Addr, config.LogFile)
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-done
+	log.Print("Server stopped")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		cancel()
+	}()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed:%+v", err)
+	}
+	log.Println("Shutdown done")
+	os.Exit(0)
+
+	return nil
+}
+
+func newServer(config *config.Config, logger *zap.Logger, evs *calendar.Calendar) *http.Server {
+
+	handler := &myHandler{
+		router:       mux.NewRouter(),
+		logger:       logger,
+		eventService: evs,
+	}
+	handler.configRouter()
+
+	server := &http.Server{
+		Addr:           config.BindAddr,
+		Handler:        handler,
+		IdleTimeout:    10 * time.Second,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	return server
+}
