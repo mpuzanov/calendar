@@ -18,9 +18,9 @@ build:
 	@go build -v -o ${APP} ${SOURCE}
 
 lint:
-	@goimports -w ${GO_SRC_DIRS}
+	@goimports -w ${GO_SRC_DIRS}	
+	@gofmt -s -w ${GO_SRC_DIRS}
 	@golangci-lint run
-	@#gofmt -w ${GO_SRC_DIRS}
 
 run:
 	@go run ${SOURCE} --config=configs/config-dev.yml

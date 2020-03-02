@@ -93,4 +93,3 @@ func (s *GRPCServer) GetUserEvents(ctx context.Context, req *RequestUser) (*Even
 	protoEvents.Status = true
 	return protoEvents, nil
 }
-
