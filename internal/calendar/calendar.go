@@ -1,8 +1,6 @@
 package calendar
 
 import (
-	"time"
-
 	"github.com/mpuzanov/otus-go/calendar/internal/interfaces"
 	"github.com/mpuzanov/otus-go/calendar/internal/model"
 )
@@ -17,24 +15,19 @@ func NewCalendar(repository interfaces.EventStorage) *Calendar {
 	return &Calendar{Events: repository}
 }
 
-//CreateEvent Создаём событие
-func (c *Calendar) CreateEvent(user, header, text string, startTime time.Time, endTime time.Time) (*model.Event, error) {
-	return c.Events.CreateEvent(user, header, text, startTime, endTime)
-}
-
 //AddEvent Добавление события
-func (c *Calendar) AddEvent(event *model.Event) error {
+func (c *Calendar) AddEvent(event *model.Event) (string, error) {
 	return c.Events.AddEvent(event)
 }
 
 //UpdateEvent Редактирование события
-func (c *Calendar) UpdateEvent(event *model.Event) error {
+func (c *Calendar) UpdateEvent(event *model.Event) (bool, error) {
 	return c.Events.UpdateEvent(event)
 }
 
 //DelEvent Удаление события
-func (c *Calendar) DelEvent(event *model.Event) error {
-	return c.Events.DelEvent(event)
+func (c *Calendar) DelEvent(id string) (bool, error) {
+	return c.Events.DelEvent(id)
 }
 
 //FindEventByID Поиск события
@@ -42,7 +35,7 @@ func (c *Calendar) FindEventByID(id string) (*model.Event, error) {
 	return c.Events.FindEventByID(id)
 }
 
-//GetEvents Выдаём список событий
-func (c *Calendar) GetEvents() []model.Event {
-	return c.Events.GetEvents()
+//GetUserEvents Выдаём список событий пользователя
+func (c *Calendar) GetUserEvents(user string) ([]model.Event, error) {
+	return c.Events.GetUserEvents(user)
 }

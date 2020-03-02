@@ -14,13 +14,13 @@ GO_TEST_DIRS := $(shell \
 	xargs -I {} dirname {}  | \
 	uniq)	
 
+build: 
+	@go build -v -o ${APP} ${SOURCE}
+
 lint:
 	@goimports -w ${GO_SRC_DIRS}
 	@golangci-lint run
 	@#gofmt -w ${GO_SRC_DIRS}
-
-build: 
-	@go build -v -o ${APP} ${SOURCE}
 
 run:
 	@go run ${SOURCE} --config=configs/config-dev.yml
@@ -28,9 +28,15 @@ run:
 test:
 	@go test -v $(GO_TEST_DIRS)
 
+gen:
+	protoc -I api/proto --go_out=plugins=grpc:internal/grpcserver api/proto/calendar.proto
+
+mod:
+	go mod tidy
+
 release:
 	rm -rf ${RELEASE_DIR}${APP}*
 	GOOS=windows GOARCH=amd64 go build -ldflags="-H windowsgui" -o ${RELEASE_DIR}/${APP}.exe main.go
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o ${RELEASE_DIR}/${APP} main.go
 
-.PHONY: build run release lint test
+.PHONY: build run release lint test gen mod

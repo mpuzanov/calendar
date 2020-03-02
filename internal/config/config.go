@@ -1,41 +1,61 @@
 package config
 
 import (
-	"io/ioutil"
-	"os"
+	"log"
 	"strings"
 
-	"gopkg.in/yaml.v2"
+	"github.com/spf13/viper"
 )
 
-// Config Структура файла с конфигурацией
+//Config Структура файла с конфигурацией
 type Config struct {
-	BindAddr      string `yaml:"http_listen"`
-	LogLevel      string `yaml:"log_level"`
-	LogFile       string `yaml:"log_file"`
-	LogFormatJSON bool   `yaml:"log_format_JSON"`
-	DbName        string `yaml:"db_name"`
-	DatabaseURL   string `yaml:"db_url"`
+	Log      LogConf `yaml:"log" mapstructure:"log"`
+	DB       DBConf  `yaml:"db" mapstructure:"db"`
+	HTTPAddr string  `yaml:"http_listen" mapstructure:"http_listen"`
+	GRPCAddr string  `yaml:"grpc_listen" mapstructure:"grpc_listen"`
+}
+
+// LogConf стуктура для настройки логирования
+type LogConf struct {
+	LogLevel      string `yaml:"loglevel" mapstructure:"loglevel"`
+	LogFile       string `yaml:"logfile" mapstructure:"logfile"`
+	LogFormatJSON bool   `yaml:"logformat_JSON" mapstructure:"logformat_JSON"`
+}
+
+// DBConf стуктура для настройки работы с базой данных
+type DBConf struct {
+	DbName      string `yaml:"db_name" mapstructure:"db_name"`
+	DatabaseURL string `yaml:"database_url" mapstructure:"url"`
 }
 
 // LoadConfig Загрузка конфигурации из файла
-func LoadConfig(filepath string) (*Config, error) {
-	configFile, err := ioutil.ReadFile(filepath)
-	if err != nil {
+func LoadConfig(filePath string) (*Config, error) {
+
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetDefault("log.loglevel", "info")
+	viper.SetDefault("http_listen", "0.0.0.0:8090")
+	viper.SetDefault("grpc_listen", "0.0.0.0:50051")
+	viper.SetDefault("db.url", "postgres://postgres:12345@localhost:5432/pg_calendar_test?sslmode=disable")
+
+	if filePath != "" {
+		log.Printf("Parsing config: %s\n", filePath)
+		viper.SetConfigFile(filePath)
+		viper.SetConfigType("yaml")
+		//log.Println(viper.ConfigFileUsed())
+		err := viper.ReadInConfig()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		log.Println("Config file is not specified.")
+	}
+	log.Println(viper.AllSettings())
+
+	var config Config
+	if err := viper.Unmarshal(&config); err != nil {
 		return nil, err
 	}
-
-	config := &Config{}
-	if err = yaml.Unmarshal(configFile, config); err != nil {
-		return nil, err
-	}
-
-	port, exists := os.LookupEnv("PORT")
-	if exists { //Заменяем порт
-		//log.Printf("PORT: %s\n", port)
-		var splits = strings.Split(config.BindAddr, ":")
-		config.BindAddr = splits[0] + ":" + port
-	}
-
-	return config, nil
+	//log.Println(config)
+	return &config, nil
 }

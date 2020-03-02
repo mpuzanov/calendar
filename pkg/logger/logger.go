@@ -5,19 +5,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/mpuzanov/otus-go/calendar/internal/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 //Logger глобальная переменная для работы
 type Logger *zap.Logger
-
-//Configuration структура для настройки логирования
-type Configuration struct {
-	Level      string
-	JSONFormat bool
-	LogFile    string
-}
 
 func getZapLevel(level string) zap.AtomicLevel {
 	switch level {
@@ -41,9 +35,9 @@ func syslogTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 }
 
 //NewLogger Возвращаем инициализированный логер
-func NewLogger(config Configuration) *zap.Logger {
+func NewLogger(config config.LogConf) *zap.Logger {
 	EncodingFormat := "json"
-	if !config.JSONFormat {
+	if !config.LogFormatJSON {
 		EncodingFormat = "console"
 	}
 	OutputPath, ErrorOutputPath := "stderr", "stderr"
@@ -58,7 +52,7 @@ func NewLogger(config Configuration) *zap.Logger {
 	}
 	cfg := zap.Config{
 		Encoding:         EncodingFormat,
-		Level:            getZapLevel(config.Level),
+		Level:            getZapLevel(config.LogLevel),
 		OutputPaths:      []string{OutputPath},
 		ErrorOutputPaths: []string{ErrorOutputPath},
 		EncoderConfig: zapcore.EncoderConfig{
@@ -80,13 +74,13 @@ func NewLogger(config Configuration) *zap.Logger {
 }
 
 //InitLogger Вариант инициализации логера
-func InitLogger(config Configuration) *zap.Logger {
+func InitLogger(config config.LogConf) *zap.Logger {
 	cfg := zap.NewProductionEncoderConfig()
 	cfg.EncodeTime = syslogTimeEncoder //zapcore.ISO8601TimeEncoder
 	cfg.CallerKey = "caller"
 	cfg.EncodeCaller = zapcore.ShortCallerEncoder
 	encoder := zapcore.NewJSONEncoder(cfg)
-	if !config.JSONFormat {
+	if !config.LogFormatJSON {
 		encoder = zapcore.NewConsoleEncoder(cfg)
 	}
 	writerSyncer := zapcore.Lock(os.Stderr) //os.Stdout
@@ -98,7 +92,7 @@ func InitLogger(config Configuration) *zap.Logger {
 			writerSyncer = zapcore.Lock(file)
 		}
 	}
-	level := getZapLevel(config.Level)
+	level := getZapLevel(config.LogLevel)
 	logger := zap.New(zapcore.NewCore(encoder, writerSyncer, level))
 
 	//zap.ReplaceGlobals(logger)

@@ -18,6 +18,10 @@ var (
 	ErrDelEvent = EventError("Ошибка удаления события")
 	//ErrEditEvent "ошибка изменения события"
 	ErrEditEvent = EventError("Ошибка изменения события")
+	//ErrNoDBAffected ошибка "Действие не затронуло ни одной строки"
+	ErrNoDBAffected = EventError("Действие не затронуло ни одной строки")
+	//ErrRecordNotFound ошибка "Запись не найдена"
+	ErrRecordNotFound = errors.New("Запись не найдена")
 )
 
 //Is обёртка над errors.Is

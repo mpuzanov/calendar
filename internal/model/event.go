@@ -10,19 +10,19 @@ import (
 //Event структура хранения события
 type Event struct {
 	//уникальный идентификатор события
-	ID uuid.UUID
+	ID uuid.UUID `db:"id"`
 	// заголовок
-	Header string
+	Header string `db:"header"`
 	// Описание события
-	Text string
+	Text string `db:"text"`
 	// Дата и время события
-	StartTime time.Time
+	StartTime time.Time `db:"start_time"`
 	// Дата окончания события
-	EndTime time.Time
+	EndTime time.Time `db:"end_time"`
 	// Пользователь, владелец события
-	User string
+	UserName string `db:"user_name"`
 	// За сколько времени высылать уведомление
-	ReminderBefore time.Duration
+	ReminderBefore time.Duration `db:"reminder_before"`
 }
 
 //String Строковое представление события

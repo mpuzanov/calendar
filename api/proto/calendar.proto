@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+package grpcserver;
+option go_package = "grpcserver";
+
+message Event {
+    string id = 1; 
+    string header = 2; 
+    string text = 3;
+    google.protobuf.Timestamp start_time = 4;
+    google.protobuf.Timestamp end_time = 5; 
+    string user = 6; 
+    google.protobuf.Duration reminder_before = 7;
+}
+
+message ResponseResult {
+    bool status = 1;
+    string id = 2;
+    string error = 3;
+}
+
+message EventsResponse {
+    bool status = 1;
+    repeated Event events = 2;
+    string error = 3;
+}
+
+message EventResponse {
+    bool status = 1;
+    Event event = 2;
+    string error = 3;
+}
+
+message RequestUser {
+    string user = 1;
+}
+
+message EventID {
+    string id = 1;
+}
+
+enum Period {
+    DAY = 0;
+    WEEK = 1;
+    MONTH = 2;
+}
+
+message PeriodRequest {
+    string user = 1;
+    Period period = 2;
+    google.protobuf.Timestamp date = 3; 
+}
+
+service Calendar {    
+    rpc AddEvent(Event) returns (ResponseResult) {}
+	rpc UpdateEvent(Event) returns (ResponseResult) {}
+	rpc DelEvent(EventID) returns (ResponseResult) {}
+    rpc FindEventByID(EventID) returns (EventResponse) {}
+    rpc GetUserEvents(RequestUser) returns (EventsResponse) {}
+}

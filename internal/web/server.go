@@ -16,9 +16,9 @@ import (
 )
 
 // Start Запуск сервера
-func Start(config *config.Config, logger *zap.Logger, evs *calendar.Calendar) error {
+func Start(conf *config.Config, logger *zap.Logger, evs *calendar.Calendar) error {
 
-	srv := newServer(config, logger, evs)
+	srv := newServer(conf, logger, evs)
 
 	//запускаем веб-сервер
 	go func() {
@@ -26,7 +26,8 @@ func Start(config *config.Config, logger *zap.Logger, evs *calendar.Calendar) er
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
-	log.Printf("Server started: %s, file log: %s\n", srv.Addr, config.LogFile)
+	log.Printf("Server http started: %s, file log: %s\n", srv.Addr, conf.Log.LogFile)
+	logger.Info("Starting Http server", zap.String("address", srv.Addr))
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -56,7 +57,7 @@ func newServer(config *config.Config, logger *zap.Logger, evs *calendar.Calendar
 	handler.configRouter()
 
 	server := &http.Server{
-		Addr:           config.BindAddr,
+		Addr:           config.HTTPAddr,
 		Handler:        handler,
 		IdleTimeout:    10 * time.Second,
 		ReadTimeout:    10 * time.Second,

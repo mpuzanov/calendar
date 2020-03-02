@@ -1,17 +1,14 @@
 package interfaces
 
 import (
-	"time"
-
 	"github.com/mpuzanov/otus-go/calendar/internal/model"
 )
 
 //EventStorage интерфейс для работы с DB
 type EventStorage interface {
-	CreateEvent(user, header, text string, startTime time.Time, endTime time.Time) (*model.Event, error)
-	AddEvent(event *model.Event) error
-	UpdateEvent(event *model.Event) error
-	DelEvent(event *model.Event) error
+	AddEvent(event *model.Event) (string, error)
+	UpdateEvent(event *model.Event) (bool, error)
+	DelEvent(id string) (bool, error)
 	FindEventByID(id string) (*model.Event, error)
-	GetEvents() []model.Event
+	GetUserEvents(user string) ([]model.Event, error)
 }

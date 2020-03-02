@@ -2,7 +2,6 @@ package memslice
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/mpuzanov/otus-go/calendar/internal/errors"
@@ -19,9 +18,11 @@ func NewEventStore() *EventStore {
 	return &EventStore{db: make([]model.Event, 0)}
 }
 
-//GetEvents Листинг событий
-func (s *EventStore) GetEvents() []model.Event {
-	return s.db
+//AddEvent Добавить событие
+func (s *EventStore) AddEvent(event *model.Event) (string, error) {
+	event.ID = uuid.New()
+	s.db = append(s.db, *event)
+	return event.ID.String(), nil
 }
 
 //FindEventByID Найти событие
@@ -34,38 +35,30 @@ func (s *EventStore) FindEventByID(id string) (*model.Event, error) {
 	return nil, errors.ErrNotEvent
 }
 
-//AddEvent Добавить событие
-func (s *EventStore) AddEvent(event *model.Event) error {
-	ev, _ := s.FindEventByID(event.ID.String())
-	if ev != nil {
-		return fmt.Errorf("событие: %s(%s) уже существует. %w", event.Header, event.ID, errors.ErrAddEvent)
-	}
-	s.db = append(s.db, *event)
-
-	return nil
-}
-
 //UpdateEvent Изменить событие
-func (s *EventStore) UpdateEvent(event *model.Event) error {
+func (s *EventStore) UpdateEvent(event *model.Event) (bool, error) {
 	for i, ev := range s.db {
 		if ev.ID == event.ID {
 			s.db[i] = *event
-			return nil
+			return true, nil
 		}
 	}
-	return fmt.Errorf("нет события: %s(%s). %w", event.Header, event.ID, errors.ErrEditEvent)
+	return false, fmt.Errorf("нет события: %s(%s). %w", event.Header, event.ID, errors.ErrEditEvent)
 }
 
 //DelEvent Удалить событие
-func (s *EventStore) DelEvent(event *model.Event) error {
-
+func (s *EventStore) DelEvent(id string) (bool, error) {
+	iduuid, err := uuid.Parse(id)
+	if err != nil {
+		return false, err
+	}
 	for i, ev := range s.db {
-		if ev.ID == event.ID {
+		if ev.ID == iduuid {
 			s.db = append(s.db[:i], s.db[i+1:]...)
-			return nil
+			return true, nil
 		}
 	}
-	return fmt.Errorf("нет события с кодом: %s. %w", event.ID, errors.ErrDelEvent)
+	return false, fmt.Errorf("нет события с кодом: %s. %w", iduuid, errors.ErrDelEvent)
 }
 
 //String Печать списка событий
@@ -75,31 +68,13 @@ func (s *EventStore) String() {
 	}
 }
 
-//CreateEvent Создание и запись события
-func (s *EventStore) CreateEvent(user, header, text string, startTime time.Time, endTime time.Time) (*model.Event, error) {
-	event := &model.Event{
-		ID:        uuid.New(),
-		User:      user,
-		Header:    header,
-		Text:      text,
-		StartTime: startTime,
-		EndTime:   endTime,
+//GetUserEvents Листинг событий пользователя
+func (s *EventStore) GetUserEvents(user string) ([]model.Event, error) {
+	var out []model.Event
+	for _, val := range s.db {
+		if val.UserName == user {
+			out = append(out, val)
+		}
 	}
-	err := s.AddEvent(event)
-	if err != nil {
-		return nil, err
-	}
-	return event, nil
-}
-
-//NewEvent Формируем новое событие
-func NewEvent(user, header, text string, startTime time.Time, endTime time.Time) *model.Event {
-	return &model.Event{
-		ID:        uuid.New(),
-		User:      user,
-		Header:    header,
-		Text:      text,
-		StartTime: startTime,
-		EndTime:   endTime,
-	}
+	return out, nil
 }

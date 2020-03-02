@@ -1,6 +1,8 @@
 package memslice
 
 import (
+	"log"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -16,19 +18,36 @@ var (
 	userName           string
 )
 
-func init() {
-	generateTestData()
-	//fmt.Println(testStore.GetEvents())
+func TestMain(m *testing.M) {
+	var err error
+	testStore, err = generateTestData()
+	if err != nil {
+		log.Fatalf("Ошибка генерации тестовых данных. %v", err)
+	}
+	// for _, v := range testStore.db {
+	// 	fmt.Print(v)
+	// }
+	os.Exit(m.Run())
 }
 
-func generateTestData() {
+func generateTestData() (*EventStore, error) {
 	userName = "user1"
 	startTime = time.Date(2020, time.April, 1, 9, 0, 0, 0, time.UTC)
 	endTime, _ = time.Parse("2006-01-02 15:04", "2020-04-01 10:30")
-	testStore = NewEventStore()
+	store := NewEventStore()
 	for i := 1; i <= 10; i++ {
-		testStore.CreateEvent(userName, "Event "+strconv.Itoa(i), "", startTime, endTime)
+		event := &model.Event{Header: "Event " + strconv.Itoa(i),
+			Text:           "",
+			StartTime:      startTime,
+			EndTime:        endTime,
+			UserName:       userName,
+			ReminderBefore: 0}
+		_, err := store.AddEvent(event)
+		if err != nil {
+			return nil, err
+		}
 	}
+	return store, nil
 }
 
 func TestFindEventByID(t *testing.T) {
@@ -61,7 +80,7 @@ func TestFindEventByID(t *testing.T) {
 
 func TestAddEvent(t *testing.T) {
 	countEvent := len(testStore.db)
-	eventTest = model.Event{User: userName, Header: "Event Add", StartTime: startTime, EndTime: endTime}
+	eventTest = model.Event{UserName: userName, Header: "Event Add", StartTime: startTime, EndTime: endTime}
 	testCases := []struct {
 		desc        string
 		eventHeader string
@@ -74,17 +93,11 @@ func TestAddEvent(t *testing.T) {
 			err:         nil,
 			want:        countEvent + 1,
 		},
-		{
-			desc:        "Test (error)", // Header совпадает
-			eventHeader: "Event Add",
-			err:         errors.ErrAddEvent,
-			want:        countEvent + 1,
-		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 
-			if err := testStore.AddEvent(&eventTest); err != nil {
+			if _, err := testStore.AddEvent(&eventTest); err != nil {
 				if !errors.Is(err, tC.err) {
 					t.Errorf("%s error: %v", tC.desc, err)
 				}
@@ -100,36 +113,36 @@ func TestAddEvent(t *testing.T) {
 
 func TestDelEvent(t *testing.T) {
 
-	var eventTestDel model.Event
-
 	countEvent := len(testStore.db)
-	//Добавляем событие для удаления
-	eventTestDel = *NewEvent("user1", "Event del_1", "", startTime, endTime)
-	testStore.db = append(testStore.db, eventTestDel)
+	delEvent := &model.Event{UserName: "user1", Header: "Event del_1", StartTime: startTime, EndTime: endTime}
+	delEventId, err := testStore.AddEvent(delEvent)
+	if err != nil {
+		t.Log("Ошибка добавления события для удаления")
+	}
 
 	testCases := []struct {
-		desc     string
-		eventDel model.Event
-		err      error
-		want     int
+		desc  string
+		delID string
+		err   error
+		want  int
 	}{
 		{
-			desc:     "Тест удаления события",
-			eventDel: eventTestDel,
-			err:      nil,
-			want:     countEvent,
+			desc:  "Тест удаления события",
+			delID: delEventId,
+			err:   nil,
+			want:  countEvent,
 		},
 		{
-			desc:     "Тест удаления события (должна быть ошибка)", //нет такого события
-			eventDel: eventTestDel,
-			err:      errors.ErrDelEvent,
-			want:     countEvent,
+			desc:  "Тест удаления события (должна быть ошибка)", //нет такого события
+			delID: delEventId,
+			err:   errors.ErrDelEvent,
+			want:  countEvent,
 		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 
-			if err := testStore.DelEvent(&tC.eventDel); err != nil {
+			if _, err := testStore.DelEvent(tC.delID); err != nil {
 				if !errors.Is(err, tC.err) {
 					t.Errorf("%s error: %v", tC.desc, err)
 				}
@@ -165,7 +178,7 @@ func TestUpdateEvent(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			tC.event.Text = tC.toText
-			if err := testStore.UpdateEvent(&tC.event); err != nil {
+			if _, err := testStore.UpdateEvent(&tC.event); err != nil {
 				if !errors.Is(err, tC.err) {
 					t.Errorf("%s error: %v", tC.desc, err)
 				}

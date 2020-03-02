@@ -1,11 +1,25 @@
+# Пример файла конфигурации для сервиса Календарь
+
+# Настройки логирования
+log: 
+    # уровень логирования (error / warn / info / debug)
+    loglevel: error
+    # путь к файлу логов
+    logfile: "file_prod.log"
+    # формат логирования
+    logformat_JSON: true
+
+# Настройки веб-сервера
 # ip и port на котором должен слушать web-сервер
-http_listen: ":5000"
-# уровень логирования (error / warn / info / debug)
-log_level: error
-# путь к файлу логов
-log_file: "file_prod.log"
-# формат логирования
-log_format_JSON: true
+http_listen: "0.0.0.0:8090"
+
+# Настройки grpc-сервера    
+# ip и port на котором должен слушать gRPC-сервер
+grpc_listen: "0.0.0.0:50051"
+
 # Настройки СУБД
-db_name: "MemoryMap"
-db_url: ""
+db:     
+    # виды storage (MemorySlice / MemoryMap / Postgres)
+    db_name: "Postgres"
+    # Строка подключения к БД
+    url: "postgres://postgres:dnypr1@localhost:5432/pg_calendar?sslmode=disable"
