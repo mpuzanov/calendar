@@ -5,19 +5,20 @@ https://github.com/golang-migrate/migrate
 
 	migrate create -ext sql -dir migrations create_extension
 	migrate create -ext sql -dir migrations create_events
+	migrate create -ext sql -dir migrations create_index
 
 **для основной базы**  
 
 	createdb -h localhost -p 5432 -U postgres pg_calendar
-	migrate -path migrations -database postgres://postgres:dnypr1@localhost:5432/pg_calendar?sslmode=disable up
-	migrate -path migrations -database postgres://postgres:dnypr1@localhost:5432/pg_calendar?sslmode=disable down
+	migrate -path migrations -database postgres://postgres:12345@localhost:5432/pg_calendar?sslmode=disable up
+	migrate -path migrations -database postgres://postgres:12345@localhost:5432/pg_calendar?sslmode=disable down
 
 
 **для тестовой базы**  
 
 	createdb -h localhost -p 5432 -U postgres pg_calendar_test
-	migrate -path migrations -database postgres://postgres:dnypr1@localhost:5432/pg_calendar_test?sslmode=disable up
-	migrate -path migrations -database postgres://postgres:dnypr1@localhost:5432/pg_calendar_test?sslmode=disable down
+	migrate -path migrations -database postgres://postgres:12345@localhost:5432/pg_calendar_test?sslmode=disable up
+	migrate -path migrations -database postgres://postgres:12345@localhost:5432/pg_calendar_test?sslmode=disable down
 
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
