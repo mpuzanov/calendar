@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/mpuzanov/otus-go/calendar/internal/model"
-	"github.com/mpuzanov/otus-go/calendar/internal/storage/postgresdb"
+	"github.com/mpuzanov/calendar/internal/model"
+	"github.com/mpuzanov/calendar/internal/storage/postgresdb"
 	"github.com/stretchr/testify/assert"
 )
 

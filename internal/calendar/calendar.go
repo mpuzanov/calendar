@@ -1,8 +1,8 @@
 package calendar
 
 import (
-	"github.com/mpuzanov/otus-go/calendar/internal/interfaces"
-	"github.com/mpuzanov/otus-go/calendar/internal/model"
+	"github.com/mpuzanov/calendar/internal/interfaces"
+	"github.com/mpuzanov/calendar/internal/model"
 )
 
 //Calendar сервис календаря

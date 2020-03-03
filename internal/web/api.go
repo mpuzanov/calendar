@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/mpuzanov/otus-go/calendar/internal/calendar"
+	"github.com/mpuzanov/calendar/internal/calendar"
 	"go.uber.org/zap"
 )
 

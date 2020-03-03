@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/pgtype"
-	"github.com/mpuzanov/otus-go/calendar/internal/model"
+	"github.com/mpuzanov/calendar/internal/model"
 )
 
 const (

@@ -3,8 +3,18 @@ language: go
 go:
     - 1.13.x
 
+services:
+    - postgresql
+
 before_install:
+    - psql -c 'create database pg_calendar_test;' -U postgres
+    - psql -U postgres -c "create extension uuid-ossp"
     go get -d -v ./cmd/calendar
+    go get github.com/golang-migrate/migrate    
+    migrate -path migrations -database postgres://postgres@127.0.0.1:5432/pg_calendar_test up
+
+env:
+    - DB_URL=postgres://postgres@127.0.0.1:5432/pg_calendar_test
 
 install: true
 
@@ -14,4 +24,4 @@ notifications:
       on_failure: always
 
 script:
-- go test -v ./...
+    - go test -v ./...

@@ -23,7 +23,10 @@ lint:
 	@golangci-lint run
 
 run:
-	@go run ${SOURCE} --config=configs/config-dev.yml
+	@go run ${SOURCE} grpc_server --config=configs/config-dev.yml
+
+run-web:
+	@go run ${SOURCE} web_server --config=configs/config-dev.yml
 
 test:
 	@go test -v $(GO_TEST_DIRS)
@@ -39,4 +42,4 @@ release:
 	GOOS=windows GOARCH=amd64 go build -ldflags="-H windowsgui" -o ${RELEASE_DIR}/${APP}.exe main.go
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o ${RELEASE_DIR}/${APP} main.go
 
-.PHONY: build run release lint test gen mod
+.PHONY: build run release lint test gen mod run-web

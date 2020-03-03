@@ -3,8 +3,8 @@ package grpcserver
 import (
 	"context"
 
-	"github.com/mpuzanov/otus-go/calendar/internal/calendar"
-	"github.com/mpuzanov/otus-go/calendar/internal/config"
+	"github.com/mpuzanov/calendar/internal/calendar"
+	"github.com/mpuzanov/calendar/internal/config"
 	"go.uber.org/zap"
 )
 

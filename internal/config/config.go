@@ -50,7 +50,7 @@ func LoadConfig(filePath string) (*Config, error) {
 	} else {
 		log.Println("Config file is not specified.")
 	}
-	log.Println(viper.AllSettings())
+	//log.Println(viper.AllSettings())
 
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {

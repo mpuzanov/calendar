@@ -3,11 +3,11 @@ package storage
 import (
 	"context"
 
-	"github.com/mpuzanov/otus-go/calendar/internal/config"
-	"github.com/mpuzanov/otus-go/calendar/internal/interfaces"
-	"github.com/mpuzanov/otus-go/calendar/internal/storage/memory"
-	"github.com/mpuzanov/otus-go/calendar/internal/storage/memslice"
-	"github.com/mpuzanov/otus-go/calendar/internal/storage/postgresdb"
+	"github.com/mpuzanov/calendar/internal/config"
+	"github.com/mpuzanov/calendar/internal/interfaces"
+	"github.com/mpuzanov/calendar/internal/storage/memory"
+	"github.com/mpuzanov/calendar/internal/storage/memslice"
+	"github.com/mpuzanov/calendar/internal/storage/postgresdb"
 )
 
 //NewStorageDB create storage for calendar

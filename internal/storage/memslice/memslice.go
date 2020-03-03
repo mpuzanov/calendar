@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/mpuzanov/otus-go/calendar/internal/errors"
-	"github.com/mpuzanov/otus-go/calendar/internal/model"
+	"github.com/mpuzanov/calendar/internal/errors"
+	"github.com/mpuzanov/calendar/internal/model"
 )
 
 //EventStore структура хранения списка событий

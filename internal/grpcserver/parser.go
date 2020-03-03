@@ -3,7 +3,7 @@ package grpcserver
 import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
-	"github.com/mpuzanov/otus-go/calendar/internal/model"
+	"github.com/mpuzanov/calendar/internal/model"
 )
 
 //EventProtoMsgToEvent переконвертируем событие protoMsg в структуру golang

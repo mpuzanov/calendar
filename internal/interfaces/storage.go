@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"github.com/mpuzanov/otus-go/calendar/internal/model"
+	"github.com/mpuzanov/calendar/internal/model"
 )
 
 //EventStorage интерфейс для работы с DB

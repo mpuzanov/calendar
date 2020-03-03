@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/mpuzanov/otus-go/calendar/internal/config"
+	"github.com/mpuzanov/calendar/internal/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
