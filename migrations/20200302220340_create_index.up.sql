@@ -1,1 +1,0 @@
-CREATE INDEX user_idx ON public.events USING btree (user_name);

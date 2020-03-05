@@ -21,7 +21,7 @@ type EventDB struct {
 	// Дата окончания события
 	EndTime time.Time `db:"end_time"`
 	// Пользователь, владелец события
-	UserName string `db:"user_name"`
+	UserName string `db:"user_id"`
 	// За сколько времени высылать уведомление
 	ReminderBefore pgtype.Interval `db:"reminder_before"`
 }

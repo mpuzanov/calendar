@@ -11,7 +11,7 @@ import (
 )
 
 //NewStorageDB create storage for calendar
-func NewStorageDB(cfg *config.Config) (*interfaces.EventStorage, error) {
+func NewStorageDB(cfg *config.Config) (interfaces.EventStorage, error) { //*interfaces.EventStorage
 	var err error
 	var db interfaces.EventStorage
 
@@ -28,5 +28,5 @@ func NewStorageDB(cfg *config.Config) (*interfaces.EventStorage, error) {
 			return nil, err
 		}
 	}
-	return &db, err
+	return db, err
 }

@@ -20,7 +20,7 @@ type Event struct {
 	// Дата окончания события
 	EndTime time.Time `db:"end_time"`
 	// Пользователь, владелец события
-	UserName string `db:"user_name"`
+	UserName string `db:"user_id"`
 	// За сколько времени высылать уведомление
 	ReminderBefore time.Duration `db:"reminder_before"`
 }

@@ -38,7 +38,7 @@ func grpcServerStart(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatalf("newStorageDB failed: %s", err)
 	}
-	calendar := calendar.NewCalendar(*db)
+	calendar := calendar.NewCalendar(db)
 
 	if err := grpcserver.Start(cfg, logger, calendar); err != nil {
 		log.Fatal(err)
