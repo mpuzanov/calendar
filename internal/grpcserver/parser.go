@@ -1,6 +1,8 @@
 package grpcserver
 
 import (
+	"fmt"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/mpuzanov/calendar/internal/model"
@@ -8,26 +10,30 @@ import (
 
 //EventProtoMsgToEvent переконвертируем событие protoMsg в структуру golang
 func EventProtoMsgToEvent(in *Event) (*model.Event, error) {
-
-	id, err := uuid.Parse(in.GetId())
-	if err != nil {
-		return nil, err
+	ID := uuid.Nil
+	if in.GetId() != "" {
+		id, err := uuid.Parse(in.GetId())
+		if err != nil {
+			return nil, fmt.Errorf("uuid.parse Id, %w", err)
+		}
+		ID = id
 	}
+
 	startTime, err := ptypes.Timestamp(in.GetStartTime())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("convert StartTime, %w", err)
 	}
 	endTime, err := ptypes.Timestamp(in.GetEndTime())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("convert EndTime, %w", err)
 	}
 	reminderBefore, err := ptypes.Duration(in.GetReminderBefore())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("convert ReminderBefore, %w", err)
 	}
 
 	event := model.Event{
-		ID:             id,
+		ID:             ID,
 		Header:         in.GetHeader(),
 		Text:           in.GetText(),
 		StartTime:      startTime,
@@ -43,11 +49,11 @@ func EventToEventProtoMsg(in *model.Event) (*Event, error) {
 
 	startTime, err := ptypes.TimestampProto(in.StartTime)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("convert StartTime, %w", err)
 	}
 	endTime, err := ptypes.TimestampProto(in.EndTime)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("convert EndTime, %w", err)
 	}
 
 	eventProto := Event{

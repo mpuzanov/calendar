@@ -14,11 +14,14 @@ import (
 
 var cfgPath string
 
-var ServerCmd = &cobra.Command{
-	Use:   "grpc_server",
-	Short: "Run grpc server",
-	Run:   grpcServerStart,
-}
+var (
+	// ServerCmd .
+	ServerCmd = &cobra.Command{
+		Use:   "grpc_server",
+		Short: "Run grpc server",
+		Run:   grpcServerStart,
+	}
+)
 
 func init() {
 	ServerCmd.Flags().StringVarP(&cfgPath, "config", "c", "", "path to the configuration file")
@@ -27,7 +30,7 @@ func init() {
 func grpcServerStart(cmd *cobra.Command, args []string) {
 	cfg, err := config.LoadConfig(cfgPath)
 	if err != nil {
-		log.Fatalf("Не удалось загрузить %s: %s", cfgPath, err)
+		log.Fatalf("unable to load %s: %s", cfgPath, err)
 	}
 	logger := logger.NewLogger(cfg.Log)
 	// Init db

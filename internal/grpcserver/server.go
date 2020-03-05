@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-//Start ...
+// Start grpc server
 func Start(conf *config.Config, logger *zap.Logger, evs *calendar.Calendar) error {
 
 	s := &GRPCServer{
