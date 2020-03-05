@@ -25,6 +25,9 @@ lint:
 run:
 	@go run ${SOURCE} grpc_server --config=configs/config-dev.yml
 
+run-client:
+	@go run ${SOURCE} grpc_client --server=":50051"
+
 run-web:
 	@go run ${SOURCE} web_server --config=configs/config-dev.yml
 
